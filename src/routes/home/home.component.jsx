@@ -1,4 +1,3 @@
-import { Outlet } from "react-router-dom";
 
 import Category from "../../components/category/category.component";
 
@@ -34,7 +33,6 @@ const Home = () => {
     return (
       <div>
         <Category categories={categories} />
-        <Outlet />
       </div>
     );
 };
