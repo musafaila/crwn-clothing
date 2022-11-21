@@ -44,9 +44,28 @@ export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
 
 // firestore database code
 export const db = getFirestore();
+
 export const createUserDocumentFromAuth = async (userAuth) => {
     const userDocRef = doc(db, 'users', userAuth.uid);
-    console.log(userDocRef);
     const userSnapShot = await getDoc(userDocRef);
-    console.log(userSnapShot.exists());
+
+    // if user data does not exist in the database...
+    // then run this code below (create the data).
+    if (!userSnapShot.exists()) {
+        const { displayName, email } = userAuth;
+        const createdAt = new Date();
+
+        try {
+            await setDoc(userDocRef, // set the document in the db
+                {
+                    displayName, email, createdAt
+                })
+        } catch (error) {
+            console.log(`There is an error creating the user ${error.message}`)
+        }
+    }
+   
+    // if user data exist in the database....
+    // then run this code (return the data).
+    return userDocRef;
 }
