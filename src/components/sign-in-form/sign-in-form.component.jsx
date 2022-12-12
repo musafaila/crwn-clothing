@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 import {
   signInWithGooglePopup,
   createUserDocumentFromAuth,
+  loginUserWithEmailAndPassword,
 } from "../../utils/firebase/firebase.utils";
 
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
+
+import { UserContext } from "../../contexts/user.context";
 
 import "./sign-in-form.styles.scss";
 
@@ -18,6 +21,10 @@ const defaultFormFields = {
 const SignInForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
+
+  // grab our setter function from UserContext.
+  // we'll use it to store the current auth user into a context.
+  const { setCurrentUser } = useContext(UserContext);
 
   //   reset form fields functions
   const resetFormFields = () => {
@@ -31,11 +38,38 @@ const SignInForm = () => {
   };
 
   // on submit handler funcrion
-  const onSubmitHandler = (event) => {
+  const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    console.log(formFields);
-    resetFormFields();
+    if (password.length < 6) {
+      alert("Password must be more than six characters!");
+      return;
+    }
+
+    try {
+      const { user } = await loginUserWithEmailAndPassword(email, password);
+
+      setCurrentUser(user);
+      // console.log(UserContext['currentUser']);
+
+      resetFormFields();
+    } catch (error) {
+      switch (error.code) {
+        case "auth/wrong-password":
+          alert("Incorrect password!");
+          break;
+        case "auth/user-not-found":
+          alert("No user associated with this email!");
+          break;
+        case "auth/network-request-failed":
+          alert(
+            "Network error, please check your network settings and try again!"
+          );
+        default:
+          alert(`Something went wrong, please try again! ${error.message}`);
+          break;
+      }
+    }
   };
 
   const googleSignIn = async () => {
@@ -68,9 +102,10 @@ const SignInForm = () => {
           onChange={onChangeHandler}
         />
 
-        <div className="button">
+        <div className="buttons-container">
           <Button type="submit" childNode="Sign In" />
           <Button
+            type="button"
             childNode="Sign In with goggle popup"
             onClick={googleSignIn}
             buttonType="google"

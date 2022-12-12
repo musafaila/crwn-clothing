@@ -4,7 +4,9 @@ import {
     signInWithPopup,
     signInWithRedirect,
     GoogleAuthProvider,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut
 } from 'firebase/auth';
 import {
     getFirestore,
@@ -78,12 +80,19 @@ export const createUserDocumentFromAuth = async (AuthUser, additionalInfo = {}) 
 // create user document from sign up
 export const createAuthUserFromEmailAndPassword = async (email, password) => {
     if (!email || !password) return;
-    // const { email, password } = userDetails;
     return await createUserWithEmailAndPassword(auth, email, password);
 }
 
 
+// login an auth user with email and password
+export const loginUserWithEmailAndPassword = async (email, password) => {
+    if (!email || !password) return;
 
-// todo: understand the spread operator clearly.
-// todo: create notes for auth and firestore db.
-// todo: split firebase utils into different folders.
+    return await signInWithEmailAndPassword(auth, email, password)
+}
+
+
+// sign out
+export const signOutUser = async() => {
+    return await signOut(auth)
+}

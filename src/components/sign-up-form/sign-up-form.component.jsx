@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   createAuthUserFromEmailAndPassword,
   createUserDocumentFromAuth,
 } from "../../utils/firebase/firebase.utils";
+
+import { UserContext } from "../../contexts/user.context";
 
 import FormInput from "../../components/form-input/form-input.component";
 import "./sign-up-form.styles.scss";
@@ -15,9 +17,12 @@ const defaultFormfields = {
   confirmPassword: "",
 };
 
+
 const SignUpForm = () => {
   const [formFields, setFormFields] = useState(defaultFormfields);
   const { displayName, email, password, confirmPassword } = formFields;
+  
+  const { setCurrentUser } = useContext(UserContext)
 
   // clear the form after submit
   const formReset = () => {
@@ -30,6 +35,7 @@ const SignUpForm = () => {
 
     setFormFields({ ...formFields, [name]: value });
   };
+
 
   // On submit handler
   const onSubmitHandler = async (event) => {
@@ -46,8 +52,12 @@ const SignUpForm = () => {
         email,
         password
       );
+
+      setCurrentUser(user)
+
       await createUserDocumentFromAuth(user, { displayName });
       formReset();
+      
     } catch (error) {
       if ((error.code = "auth/email-already-in-use")) {
         alert("This user already exist");
@@ -59,7 +69,7 @@ const SignUpForm = () => {
   return (
     <div className="sign-up-container">
       <h2>Don't have an account?</h2>      
-      <span>Sign Up with email and password</span>
+      <span>Sign Up with email and password</span>      
       <form onSubmit={onSubmitHandler}>
         <FormInput
           label="Name"
