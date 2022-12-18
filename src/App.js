@@ -1,16 +1,10 @@
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import Navigation from "./routes/navigation/navigation.component";
 import Home from "./routes/home/home.component";
 import Authentication from './routes/authentication/authentication.component';
-import SignUpForm from './components/sign-up-form/sign-up-form.component';
+import Shop from './routes/shop/shop.component';
 
-
-const Shop = () => {
-  return (
-    <h1>I am the shop component</h1>
-  )
-}
 
 const App = () => {
   return (
